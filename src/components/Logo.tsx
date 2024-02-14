@@ -1,20 +1,14 @@
 import styled from "styled-components";
 
-const StyledLogo = styled.div`
-    text-align: center;
-`;
-
-const Img = styled.img`
+const StyledLogo = styled.img`
     width: auto;
     height: 9.6rem;
+    display: block;
+    margin: 0 auto;
 `;
 
 const Logo = () => {
-    return (
-        <StyledLogo>
-            <Img src="/logo-light.png" alt="Logo" />
-        </StyledLogo>
-    );
+    return <StyledLogo src="/logo-light.png" alt="Logo" />;
 };
 
 export default Logo;

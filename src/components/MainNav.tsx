@@ -1,18 +1,34 @@
+// import styled from "styled-components";
+
+import { NavLink } from "react-router-dom";
 import styled from "styled-components";
 
-const NavList = styled.ul`
+import {
+    HiOutlineCalendarDays,
+    HiOutlineCog6Tooth,
+    HiOutlineHome,
+    HiOutlineHomeModern,
+    HiOutlineUsers,
+} from "react-icons/hi2";
+
+const StyledNavList = styled.ul`
+    width: 100%;
     display: flex;
     flex-direction: column;
+    align-items: center;
     gap: 0.8rem;
 `;
 
-const Link = styled.a`
+const StyledNavItem = styled.li`
+    width: 100%;
+`;
+
+const StyledNavLink = styled(NavLink)`
     &:link,
     &:visited {
         display: flex;
         align-items: center;
         gap: 1.2rem;
-
         color: var(--color-grey-600);
         font-size: 1.6rem;
         font-weight: 500;
@@ -44,3 +60,44 @@ const Link = styled.a`
         color: var(--color-brand-600);
     }
 `;
+
+const MainNav = () => {
+    return (
+        <nav>
+            <StyledNavList>
+                <StyledNavItem>
+                    <StyledNavLink to={"/dashboard"}>
+                        <HiOutlineHome />
+                        <span>Home</span>
+                    </StyledNavLink>
+                </StyledNavItem>
+                <StyledNavItem>
+                    <StyledNavLink to={"/bookings"}>
+                        <HiOutlineCalendarDays />
+                        <span>Bookings</span>
+                    </StyledNavLink>
+                </StyledNavItem>
+                <StyledNavItem>
+                    <StyledNavLink to={"/cabins"}>
+                        <HiOutlineHomeModern />
+                        <span>Cabins</span>
+                    </StyledNavLink>
+                </StyledNavItem>
+                <StyledNavItem>
+                    <StyledNavLink to={"/users"}>
+                        <HiOutlineUsers />
+                        <span>Users</span>
+                    </StyledNavLink>
+                </StyledNavItem>
+                <StyledNavItem>
+                    <StyledNavLink to={"/settings"}>
+                        <HiOutlineCog6Tooth />
+                        <span>Settings</span>
+                    </StyledNavLink>
+                </StyledNavItem>
+            </StyledNavList>
+        </nav>
+    );
+};
+
+export default MainNav;
