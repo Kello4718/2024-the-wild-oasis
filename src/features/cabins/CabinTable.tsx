@@ -1,9 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
 import styled from "styled-components";
-import getCabins from "../../services/apiCabins";
+import { getCabins } from "../../services/apiCabins";
 import Spinner from "../../components/Spinner";
 import CabinRow from "./CabinRow";
-import { CabinData } from "../../types/types";
+import { CabinTableData } from "../../types/types";
+import ErrorFallback from "../../components/ErrorFallback";
+import Row from "../../components/Row";
+import { useState } from "react";
 
 const StyledCabinTable = styled.table`
     width: 100%;
@@ -32,27 +35,43 @@ const StyledCabinTableHeader = styled.th`
     padding: 2rem;
 `;
 
+const StyleCabinCreateButton = styled.button`
+    margin: 0 0 0 auto;
+`;
+
 const CabinTable = () => {
-    const { data, status } = useQuery({
+    const [showForm, setShowForm] = useState(false);
+    console.log(showForm);
+    //TODO
+    const { data, status, error } = useQuery({
         queryKey: ["cabin"],
         queryFn: getCabins,
     });
-    console.log(data, status);
     if (status === "pending") return <Spinner />;
+    if (status === "error") return <ErrorFallback message={error.message} />;
     return (
-        <StyledCabinTable>
-            <StyledCabinTableRow>
-                <StyledCabinTableHeader>Photo</StyledCabinTableHeader>
-                <StyledCabinTableHeader>Cabin</StyledCabinTableHeader>
-                <StyledCabinTableHeader>Capacity</StyledCabinTableHeader>
-                <StyledCabinTableHeader>Price</StyledCabinTableHeader>
-                <StyledCabinTableHeader>Discount</StyledCabinTableHeader>
-                <StyledCabinTableHeader>Action</StyledCabinTableHeader>
-            </StyledCabinTableRow>
-            {data?.map((cabin: CabinData) => (
-                <CabinRow key={cabin.id} cabin={cabin} />
-            ))}
-        </StyledCabinTable>
+        <Row type="vertical">
+            <StyledCabinTable>
+                <StyledCabinTableRow>
+                    <StyledCabinTableHeader>Photo</StyledCabinTableHeader>
+                    <StyledCabinTableHeader>Cabin</StyledCabinTableHeader>
+                    <StyledCabinTableHeader>Capacity</StyledCabinTableHeader>
+                    <StyledCabinTableHeader>Price</StyledCabinTableHeader>
+                    <StyledCabinTableHeader>Discount</StyledCabinTableHeader>
+                    <StyledCabinTableHeader>Action</StyledCabinTableHeader>
+                </StyledCabinTableRow>
+                {data?.map((cabin: CabinTableData) => (
+                    <CabinRow key={cabin.id} cabin={cabin} />
+                ))}
+            </StyledCabinTable>
+            <Row>
+                <StyleCabinCreateButton
+                    onClick={() => setShowForm((prevState) => !prevState)}
+                >
+                    Create cabin
+                </StyleCabinCreateButton>
+            </Row>
+        </Row>
     );
 };
 

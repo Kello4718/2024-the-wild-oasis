@@ -1,6 +1,12 @@
 import styled from "styled-components";
-import { CabinData } from "../../types/types";
+import { CabinTableData } from "../../types/types";
 import { formatCurrency } from "../../utils/helpers";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { deleteCabin } from "../../services/apiCabins";
+import toast from "react-hot-toast";
+import CabinForm from "./CabinForm";
+import { Modal as StyledModal } from "../../components/StyledModal";
+import { useState } from "react";
 
 const StyledTableRow = styled.div`
     display: grid;
@@ -58,18 +64,52 @@ const StyledButton = styled.button`
     color: var(--color-green-700);
 `;
 
-const CabinRow = ({ cabin }: { cabin: CabinData }) => {
-    const { image, name, description, maxCapacity, regularPrice, discount } =
-        cabin;
+const CabinRow = ({ cabin }: { cabin: CabinTableData }) => {
+    const {
+        image,
+        name,
+        description,
+        maxCapacity,
+        regularPrice,
+        discount,
+        id,
+    } = cabin;
+
+    const queryClient = useQueryClient();
+    const [showForm] = useState(false);
+    //TODO
+    const { isPending, mutate, status } = useMutation({
+        mutationFn: deleteCabin,
+        onSuccess: () => {
+            toast.success("Cabin was deleted 😊");
+            queryClient.invalidateQueries({
+                queryKey: ["cabin"],
+            });
+        },
+        onError: () => toast.error("Woops... something that wrong... 😒"),
+    });
+    console.log(status);
     return (
-        <StyledTableRow>
-            <StyledImg src={image} alt={description} />
-            <StyledCabin>{name}</StyledCabin>
-            <StyledCapacity>{maxCapacity}</StyledCapacity>
-            <StyledPrice>{formatCurrency(regularPrice)}</StyledPrice>
-            <StyledDiscount>{formatCurrency(discount)}</StyledDiscount>
-            <StyledButton>Delete</StyledButton>
-        </StyledTableRow>
+        <>
+            <StyledTableRow>
+                <StyledImg src={image} alt={description} />
+                <StyledCabin>{name}</StyledCabin>
+                <StyledCapacity>{maxCapacity}</StyledCapacity>
+                <StyledPrice>{formatCurrency(regularPrice)}</StyledPrice>
+                <StyledDiscount>{formatCurrency(discount)}</StyledDiscount>
+                <StyledButton
+                    onClick={() => mutate(id)}
+                    disabled={isPending ? true : false}
+                >
+                    {isPending ? "Deleting..." : "Delete"}
+                </StyledButton>
+            </StyledTableRow>
+            {showForm && (
+                <StyledModal>
+                    <CabinForm />
+                </StyledModal>
+            )}
+        </>
     );
 };
 

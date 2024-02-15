@@ -1,3 +1,5 @@
+import { FC } from "react";
+import { VscChromeClose } from "react-icons/vsc";
 import styled from "styled-components";
 
 const StyledModal = styled.div`
@@ -12,7 +14,7 @@ const StyledModal = styled.div`
     transition: all 0.5s;
 `;
 
-const Overlay = styled.div`
+const StyledOverlay = styled.div`
     width: 100%;
     height: 100vh;
     position: fixed;
@@ -24,10 +26,10 @@ const Overlay = styled.div`
     z-index: 1000;
 `;
 
-const Button = styled.button`
+const StyledButtonClose = styled.button`
     position: absolute;
-    top: 1.2rem;
-    right: 1.9rem;
+    top: 0.5rem;
+    right: 1.5rem;
     transform: translateX(0.8rem);
     background: none;
     border: none;
@@ -48,3 +50,20 @@ const Button = styled.button`
         color: var(--color-grey-500);
     }
 `;
+
+type ModalProps = {
+    children: JSX.Element;
+};
+
+export const Modal: FC<ModalProps> = ({ children }) => {
+    return (
+        <StyledOverlay>
+            <StyledModal>
+                {children}
+                <StyledButtonClose>
+                    <VscChromeClose />
+                </StyledButtonClose>
+            </StyledModal>
+        </StyledOverlay>
+    );
+};

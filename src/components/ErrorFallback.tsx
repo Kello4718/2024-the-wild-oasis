@@ -1,3 +1,4 @@
+import { FC } from "react";
 import styled from "styled-components";
 
 const StyledErrorFallback = styled.main`
@@ -9,7 +10,7 @@ const StyledErrorFallback = styled.main`
     padding: 4.8rem;
 `;
 
-const Box = styled.div`
+const StyledBox = styled.div`
     flex: 0 1 96rem;
     text-align: center;
     background-color: var(--color-grey-0);
@@ -27,3 +28,20 @@ const Box = styled.div`
         margin-bottom: 3.2rem;
     }
 `;
+
+type ErrorFallbackProps = {
+    message: string;
+};
+
+const ErrorFallback: FC<ErrorFallbackProps> = ({ message }) => {
+    return (
+        <StyledErrorFallback>
+            <StyledBox>
+                <h1>Ошибка</h1>
+                <p>{message}</p>
+            </StyledBox>
+        </StyledErrorFallback>
+    );
+};
+
+export default ErrorFallback;
