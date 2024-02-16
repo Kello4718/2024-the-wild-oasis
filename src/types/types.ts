@@ -1,3 +1,11 @@
+type CabinFormDataImageName = {
+    name: string;
+};
+
+type CabinFormDataImage = {
+    0: CabinFormDataImageName;
+};
+
 export type CabinTableData = {
     id: number;
     createdAt: Date;
@@ -9,5 +17,12 @@ export type CabinTableData = {
     image: string;
 };
 
-export type CabinFormData = Omit<CabinTableData, "id" | "createdAt">;
-//TODO
+export type CabinFormData = {
+    id?: number;
+    name: string;
+    maxCapacity: number;
+    regularPrice: number;
+    discount: number;
+    description: string;
+    image: CabinFormDataImage;
+};

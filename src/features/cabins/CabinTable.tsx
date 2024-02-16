@@ -6,7 +6,7 @@ import CabinRow from "./CabinRow";
 import { CabinTableData } from "../../types/types";
 import ErrorFallback from "../../components/ErrorFallback";
 import Row from "../../components/Row";
-import { useState } from "react";
+import { memo } from "react";
 
 const StyledCabinTable = styled.table`
     width: 100%;
@@ -35,14 +35,7 @@ const StyledCabinTableHeader = styled.th`
     padding: 2rem;
 `;
 
-const StyleCabinCreateButton = styled.button`
-    margin: 0 0 0 auto;
-`;
-
-const CabinTable = () => {
-    const [showForm, setShowForm] = useState(false);
-    console.log(showForm);
-    //TODO
+const CabinTable = memo(() => {
     const { data, status, error } = useQuery({
         queryKey: ["cabin"],
         queryFn: getCabins,
@@ -52,27 +45,28 @@ const CabinTable = () => {
     return (
         <Row type="vertical">
             <StyledCabinTable>
-                <StyledCabinTableRow>
-                    <StyledCabinTableHeader>Photo</StyledCabinTableHeader>
-                    <StyledCabinTableHeader>Cabin</StyledCabinTableHeader>
-                    <StyledCabinTableHeader>Capacity</StyledCabinTableHeader>
-                    <StyledCabinTableHeader>Price</StyledCabinTableHeader>
-                    <StyledCabinTableHeader>Discount</StyledCabinTableHeader>
-                    <StyledCabinTableHeader>Action</StyledCabinTableHeader>
-                </StyledCabinTableRow>
-                {data?.map((cabin: CabinTableData) => (
-                    <CabinRow key={cabin.id} cabin={cabin} />
-                ))}
+                <thead>
+                    <StyledCabinTableRow>
+                        <StyledCabinTableHeader>Photo</StyledCabinTableHeader>
+                        <StyledCabinTableHeader>Cabin</StyledCabinTableHeader>
+                        <StyledCabinTableHeader>
+                            Capacity
+                        </StyledCabinTableHeader>
+                        <StyledCabinTableHeader>Price</StyledCabinTableHeader>
+                        <StyledCabinTableHeader>
+                            Discount
+                        </StyledCabinTableHeader>
+                        <StyledCabinTableHeader>Action</StyledCabinTableHeader>
+                    </StyledCabinTableRow>
+                </thead>
+                <tbody>
+                    {data?.map((cabin: CabinTableData) => (
+                        <CabinRow key={cabin.id} cabin={cabin} />
+                    ))}
+                </tbody>
             </StyledCabinTable>
-            <Row>
-                <StyleCabinCreateButton
-                    onClick={() => setShowForm((prevState) => !prevState)}
-                >
-                    Create cabin
-                </StyleCabinCreateButton>
-            </Row>
         </Row>
     );
-};
+});
 
 export default CabinTable;

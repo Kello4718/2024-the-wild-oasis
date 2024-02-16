@@ -1,54 +1,28 @@
-import styled from "styled-components";
-
-import StyledInput from "../../components/StyledInput";
-import StyledForm from "../../components/StyledForm";
-import Button from "../../components/Button";
-import FileInput from "../../components/FileInput";
-import StyledTextarea from "../../components/StyledTextarea";
+import Input from "../../components/Input";
+import Form from "../../components/Form";
 import { useForm } from "react-hook-form";
 import { CabinFormData } from "../../types/types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createCabin } from "../../services/apiCabins";
 import toast from "react-hot-toast";
-
-const StyledFormRow = styled.div`
-    display: grid;
-    align-items: center;
-    grid-template-columns: 24rem 1fr 1.2fr;
-    gap: 2.4rem;
-
-    padding: 1.2rem 0;
-
-    &:first-child {
-        padding-top: 0;
-    }
-
-    &:last-child {
-        padding-bottom: 0;
-    }
-
-    &:not(:last-child) {
-        border-bottom: 1px solid var(--color-grey-100);
-    }
-
-    &:has(button) {
-        display: flex;
-        justify-content: flex-end;
-        gap: 1.2rem;
-    }
-`;
-
-const StyledFormLabel = styled.label`
-    font-weight: 500;
-`;
-
-// const StyledFormError = styled.span`
-//     font-size: 1.4rem;
-//     color: var(--color-red-700);
-// `;
+import FormRow from "../../components/FormRow";
+import Row from "../../components/Row";
+import { Button } from "../../components/Button";
+import Textarea from "../../components/Textarea";
+import FileInput from "../../components/FileInput";
+import useCabinsContext from "../../contexts/useCabinsContext";
 
 const CabinForm = () => {
-    const { register, handleSubmit, reset } = useForm<CabinFormData>();
+    const {
+        register,
+        handleSubmit,
+        reset,
+        formState: { errors },
+        getValues,
+    } = useForm<CabinFormData>({
+        mode: "onTouched",
+    });
+    const { setShowCabin } = useCabinsContext();
     const queryClient = useQueryClient();
     const { mutate } = useMutation({
         mutationFn: createCabin,
@@ -63,72 +37,94 @@ const CabinForm = () => {
     });
 
     const onSubmit = (data: CabinFormData) => {
-        console.log(data);
-        mutate(data);
+        const image = data.image[0].name;
+        console.log({ ...data, image });
+        mutate({ ...data, image });
     };
-    return (
-        <StyledForm onSubmit={handleSubmit(onSubmit)}>
-            <StyledFormRow>
-                <StyledFormLabel htmlFor="name">Cabin name</StyledFormLabel>
-                <StyledInput type="text" id="name" {...register("name")} />
-            </StyledFormRow>
 
-            <StyledFormRow>
-                <StyledFormLabel htmlFor="maxCapacity">
-                    Maximum capacity
-                </StyledFormLabel>
-                <StyledInput
+    const onError = () => console.log(errors);
+
+    return (
+        <Form onSubmit={handleSubmit(onSubmit, onError)}>
+            <FormRow label="Cabin name" errors={errors.name}>
+                <Input
+                    type="text"
+                    id="name"
+                    {...register("name", {
+                        required: "This field is required 🙋‍♂️",
+                    })}
+                />
+            </FormRow>
+
+            <FormRow label="Maximum capacity" errors={errors.maxCapacity}>
+                <Input
                     type="number"
                     id="maxCapacity"
-                    {...register("maxCapacity")}
+                    {...register("maxCapacity", {
+                        required: "This field is required 🙋‍♂️",
+                        min: {
+                            value: 1,
+                            message: "Capacity must be more than 0",
+                        },
+                    })}
                 />
-            </StyledFormRow>
+            </FormRow>
 
-            <StyledFormRow>
-                <StyledFormLabel htmlFor="regularPrice">
-                    Regular price
-                </StyledFormLabel>
-                <StyledInput
+            <FormRow label="Regular price" errors={errors.regularPrice}>
+                <Input
                     type="number"
                     id="regularPrice"
-                    {...register("regularPrice")}
+                    {...register("regularPrice", {
+                        required: "This field is required 🙋‍♂️",
+                    })}
                 />
-            </StyledFormRow>
+            </FormRow>
 
-            <StyledFormRow>
-                <StyledFormLabel htmlFor="discount">Discount</StyledFormLabel>
-                <StyledInput
+            <FormRow label="Discount" errors={errors.discount}>
+                <Input
                     type="number"
                     id="discount"
                     defaultValue={0}
-                    {...register("discount")}
+                    {...register("discount", {
+                        validate: (value: number) =>
+                            value < Number(getValues().regularPrice) ||
+                            "Discount can't be more than price",
+                    })}
                 />
-            </StyledFormRow>
+            </FormRow>
 
-            <StyledFormRow>
-                <StyledFormLabel htmlFor="description">
-                    Description for website
-                </StyledFormLabel>
-                <StyledTextarea
+            <FormRow
+                label="Description for website"
+                errors={errors.description}
+            >
+                <Textarea
                     id="description"
                     defaultValue=""
                     {...register("description")}
                 />
-            </StyledFormRow>
+            </FormRow>
 
-            <StyledFormRow>
-                <StyledFormLabel htmlFor="image">Cabin photo</StyledFormLabel>
-                <FileInput id="image" accept="image/*" {...register("image")} />
-            </StyledFormRow>
+            <FormRow label="Cabin photo" errors={errors.image}>
+                <FileInput
+                    id="image"
+                    accept="image/*"
+                    {...register("image", {
+                        required: "This field is required 🙋‍♂️",
+                    })}
+                />
+            </FormRow>
 
-            <StyledFormRow>
-                {/* type is an HTML attribute! */}
-                {/* <Button variation="secondary" type="reset">
+            <Row>
+                <Button
+                    variation="secondary"
+                    type="reset"
+                    onClick={() => setShowCabin(false)}
+                >
                     Cancel
-                </Button> */}
-                <Button>Edit cabin</Button>
-            </StyledFormRow>
-        </StyledForm>
+                </Button>
+                <Button>Add cabin</Button>
+            </Row>
+        </Form>
     );
 };
 

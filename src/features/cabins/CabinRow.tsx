@@ -4,11 +4,9 @@ import { formatCurrency } from "../../utils/helpers";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { deleteCabin } from "../../services/apiCabins";
 import toast from "react-hot-toast";
-import CabinForm from "./CabinForm";
-import { Modal as StyledModal } from "../../components/StyledModal";
-import { useState } from "react";
+import { Button } from "../../components/Button";
 
-const StyledTableRow = styled.div`
+const StyledTableRow = styled.tr`
     display: grid;
     grid-template-columns: 1fr 2fr 2fr 1fr 1fr 1fr;
     column-gap: 2rem;
@@ -18,6 +16,8 @@ const StyledTableRow = styled.div`
         border-bottom: 1px solid var(--color-grey-100);
     }
 `;
+
+const StyledTableCell = styled.td``;
 
 const StyledImg = styled.img`
     width: 100%;
@@ -58,11 +58,11 @@ const StyledDiscount = styled.span`
     padding: 2rem;
 `;
 
-const StyledButton = styled.button`
-    font-family: "Sono";
-    font-weight: 500;
-    color: var(--color-green-700);
-`;
+// const StyledButton = styled.button`
+//     font-family: "Sono";
+//     font-weight: 500;
+//     color: var(--color-green-700);
+// `;
 
 const CabinRow = ({ cabin }: { cabin: CabinTableData }) => {
     const {
@@ -76,8 +76,6 @@ const CabinRow = ({ cabin }: { cabin: CabinTableData }) => {
     } = cabin;
 
     const queryClient = useQueryClient();
-    const [showForm] = useState(false);
-    //TODO
     const { isPending, mutate, status } = useMutation({
         mutationFn: deleteCabin,
         onSuccess: () => {
@@ -89,27 +87,35 @@ const CabinRow = ({ cabin }: { cabin: CabinTableData }) => {
         onError: () => toast.error("Woops... something that wrong... 😒"),
     });
     console.log(status);
+    // TODO
     return (
-        <>
-            <StyledTableRow>
+        <StyledTableRow>
+            <StyledTableCell>
                 <StyledImg src={image} alt={description} />
+            </StyledTableCell>
+            <StyledTableCell>
                 <StyledCabin>{name}</StyledCabin>
+            </StyledTableCell>
+            <StyledTableCell>
                 <StyledCapacity>{maxCapacity}</StyledCapacity>
+            </StyledTableCell>
+            <StyledTableCell>
                 <StyledPrice>{formatCurrency(regularPrice)}</StyledPrice>
+            </StyledTableCell>
+            <StyledTableCell>
                 <StyledDiscount>{formatCurrency(discount)}</StyledDiscount>
-                <StyledButton
+            </StyledTableCell>
+            <StyledTableCell>
+                <Button
+                    style={{ margin: "0 0 0 20px" }}
+                    variation="secondary"
                     onClick={() => mutate(id)}
                     disabled={isPending ? true : false}
                 >
                     {isPending ? "Deleting..." : "Delete"}
-                </StyledButton>
-            </StyledTableRow>
-            {showForm && (
-                <StyledModal>
-                    <CabinForm />
-                </StyledModal>
-            )}
-        </>
+                </Button>
+            </StyledTableCell>
+        </StyledTableRow>
     );
 };
 

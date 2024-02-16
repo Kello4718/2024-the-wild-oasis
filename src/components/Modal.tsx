@@ -1,6 +1,7 @@
 import { FC } from "react";
 import { VscChromeClose } from "react-icons/vsc";
 import styled from "styled-components";
+import useCabinsContext from "../contexts/useCabinsContext";
 
 const StyledModal = styled.div`
     position: fixed;
@@ -56,11 +57,12 @@ type ModalProps = {
 };
 
 export const Modal: FC<ModalProps> = ({ children }) => {
+    const { setShowCabin } = useCabinsContext();
     return (
         <StyledOverlay>
             <StyledModal>
                 {children}
-                <StyledButtonClose>
+                <StyledButtonClose onClick={() => setShowCabin(false)}>
                     <VscChromeClose />
                 </StyledButtonClose>
             </StyledModal>
