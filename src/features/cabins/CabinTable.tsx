@@ -4,9 +4,10 @@ import { getCabins } from "../../services/apiCabins";
 import Spinner from "../../components/Spinner";
 import CabinRow from "./CabinRow";
 import { CabinTableData } from "../../types/types";
-import ErrorFallback from "../../components/ErrorFallback";
 import Row from "../../components/Row";
 import { memo } from "react";
+import useCabinsContext from "../../contexts/useCabinsContext";
+import ErrorFallback from "../../components/ErrorFallback";
 
 const StyledCabinTable = styled.table`
     width: 100%;
@@ -23,7 +24,7 @@ const StyledCabinTableRow = styled.tr`
     text-align: left;
     letter-spacing: 0.4px;
     display: grid;
-    grid-template-columns: 1fr 2fr 2fr 1fr 1fr 1fr;
+    grid-template-columns: 1fr 2fr 2fr 1fr 1fr 1.2fr;
     column-gap: 2rem;
     align-items: center;
     color: var(--color-grey-600);
@@ -36,12 +37,16 @@ const StyledCabinTableHeader = styled.th`
 `;
 
 const CabinTable = memo(() => {
-    const { data, status, error } = useQuery({
+    const { data, status, error, refetch } = useQuery({
         queryKey: ["cabin"],
         queryFn: getCabins,
     });
+    const { setStatus } = useCabinsContext();
+    setStatus(status);
     if (status === "pending") return <Spinner />;
-    if (status === "error") return <ErrorFallback message={error.message} />;
+    if (status === "error")
+        return <ErrorFallback message={error?.message} reloadData={refetch} />;
+
     return (
         <Row type="vertical">
             <StyledCabinTable>

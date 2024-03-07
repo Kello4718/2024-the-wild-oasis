@@ -12,17 +12,27 @@ import Textarea from "../../components/Textarea";
 import FileInput from "../../components/FileInput";
 import useCabinsContext from "../../contexts/useCabinsContext";
 
+const dt = new DataTransfer();
+dt.items.add(new File(["0"], "primer.txt", { type: "text/plain" }));
+const file_list = dt.files;
+
+console.log("Коллекция файлов создана:");
+console.dir(file_list);
+
 const CabinForm = () => {
+    const { setShowCabin, cabinForm } = useCabinsContext();
     const {
         register,
         handleSubmit,
         reset,
         formState: { errors },
         getValues,
+        // setValue,
     } = useForm<CabinFormData>({
         mode: "onTouched",
+        // defaultValues: cabinForm ? { ...cabinForm, image: file_list } : {},
+        defaultValues: cabinForm ? { ...cabinForm, image: file_list } : {},
     });
-    const { setShowCabin } = useCabinsContext();
     const queryClient = useQueryClient();
     const { mutate } = useMutation({
         mutationFn: createCabin,
@@ -32,18 +42,16 @@ const CabinForm = () => {
                 queryKey: ["cabin"],
             });
             reset();
+            setShowCabin(false);
         },
         onError: () => toast.error("Woops... something that wrong... 😒"),
     });
 
     const onSubmit = (data: CabinFormData) => {
-        const image = data.image[0].name;
-        console.log({ ...data, image });
+        const image = getValues().image;
         mutate({ ...data, image });
     };
-
     const onError = () => console.log(errors);
-
     return (
         <Form onSubmit={handleSubmit(onSubmit, onError)}>
             <FormRow label="Cabin name" errors={errors.name}>
@@ -53,6 +61,7 @@ const CabinForm = () => {
                     {...register("name", {
                         required: "This field is required 🙋‍♂️",
                     })}
+                    placeholder="Enter name of cabin"
                 />
             </FormRow>
 
@@ -67,6 +76,7 @@ const CabinForm = () => {
                             message: "Capacity must be more than 0",
                         },
                     })}
+                    placeholder="Enter your capacity"
                 />
             </FormRow>
 
@@ -77,6 +87,7 @@ const CabinForm = () => {
                     {...register("regularPrice", {
                         required: "This field is required 🙋‍♂️",
                     })}
+                    placeholder="Enter regular price"
                 />
             </FormRow>
 
@@ -84,12 +95,13 @@ const CabinForm = () => {
                 <Input
                     type="number"
                     id="discount"
-                    defaultValue={0}
                     {...register("discount", {
-                        validate: (value: number) =>
-                            value < Number(getValues().regularPrice) ||
+                        validate: (value) =>
+                            (value &&
+                                value < Number(getValues().regularPrice)) ||
                             "Discount can't be more than price",
                     })}
+                    placeholder="Enter discount"
                 />
             </FormRow>
 
@@ -101,6 +113,7 @@ const CabinForm = () => {
                     id="description"
                     defaultValue=""
                     {...register("description")}
+                    placeholder="Enter description of cabin"
                 />
             </FormRow>
 
@@ -108,6 +121,7 @@ const CabinForm = () => {
                 <FileInput
                     id="image"
                     accept="image/*"
+                    // value={file_list[0] && file_list[0].name}
                     {...register("image", {
                         required: "This field is required 🙋‍♂️",
                     })}

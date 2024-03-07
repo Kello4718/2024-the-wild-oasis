@@ -2,7 +2,7 @@ import { FC } from "react";
 import styled from "styled-components";
 
 const StyledErrorFallback = styled.main`
-    height: 100vh;
+    height: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -31,14 +31,18 @@ const StyledBox = styled.div`
 
 type ErrorFallbackProps = {
     message: string;
+    reloadData: () => void;
 };
 
-const ErrorFallback: FC<ErrorFallbackProps> = ({ message }) => {
+const ErrorFallback: FC<ErrorFallbackProps> = ({ message, reloadData }) => {
     return (
         <StyledErrorFallback>
             <StyledBox>
                 <h1>Ошибка</h1>
                 <p>{message}</p>
+                {reloadData && (
+                    <button onClick={reloadData}>Загрузить данные</button>
+                )}
             </StyledBox>
         </StyledErrorFallback>
     );

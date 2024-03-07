@@ -1,9 +1,15 @@
-type CabinFormDataImageName = {
-    name: string;
+type CabinFormDataImageInfo = {
+    name?: string;
+    lastModified?: number;
+    lastModifiedDate?: Date;
+    size?: number;
+    type?: string;
+    webkitRelativePath?: string;
 };
 
 type CabinFormDataImage = {
-    0: CabinFormDataImageName;
+    0: CabinFormDataImageInfo;
+    length: number;
 };
 
 export type CabinTableData = {
@@ -20,9 +26,9 @@ export type CabinTableData = {
 export type CabinFormData = {
     id?: number;
     name: string;
-    maxCapacity: number;
-    regularPrice: number;
-    discount: number;
+    maxCapacity: number | null;
+    regularPrice: number | null;
+    discount: number | null;
     description: string;
-    image: CabinFormDataImage;
+    image?: CabinFormDataImage;
 };

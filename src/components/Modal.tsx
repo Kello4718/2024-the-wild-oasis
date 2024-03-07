@@ -3,6 +3,10 @@ import { VscChromeClose } from "react-icons/vsc";
 import styled from "styled-components";
 import useCabinsContext from "../contexts/useCabinsContext";
 
+type ModalProps = {
+    children: JSX.Element;
+};
+
 const StyledModal = styled.div`
     position: fixed;
     top: 50%;
@@ -52,17 +56,24 @@ const StyledButtonClose = styled.button`
     }
 `;
 
-type ModalProps = {
-    children: JSX.Element;
-};
-
 export const Modal: FC<ModalProps> = ({ children }) => {
-    const { setShowCabin } = useCabinsContext();
+    const { setShowCabin, setCabinForm } = useCabinsContext();
+    const onCloseHandle = () => {
+        setShowCabin(false);
+        setCabinForm({
+            name: "",
+            maxCapacity: 0,
+            regularPrice: 0,
+            discount: 0,
+            description: "",
+            // image: { name: "" },
+        });
+    };
     return (
         <StyledOverlay>
             <StyledModal>
                 {children}
-                <StyledButtonClose onClick={() => setShowCabin(false)}>
+                <StyledButtonClose onClick={onCloseHandle}>
                     <VscChromeClose />
                 </StyledButtonClose>
             </StyledModal>
