@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, useEffect, useRef } from "react";
 import { VscChromeClose } from "react-icons/vsc";
 import styled from "styled-components";
 import useCabinsContext from "../contexts/useCabinsContext";
@@ -49,28 +49,46 @@ const StyledButtonClose = styled.button`
     & svg {
         width: 2.4rem;
         height: 2.4rem;
-        /* Sometimes we need both */
-        /* fill: var(--color-grey-500);
-    stroke: var(--color-grey-500); */
         color: var(--color-grey-500);
     }
 `;
 
 export const Modal: FC<ModalProps> = ({ children }) => {
-    const { setShowCabin, setCabinForm } = useCabinsContext();
+    const { showCabin, setShowCabin, setCabinForm } = useCabinsContext();
     const onCloseHandle = () => {
         setShowCabin(false);
-        setCabinForm({
-            name: "",
-            maxCapacity: 0,
-            regularPrice: 0,
-            discount: 0,
-            description: "",
-            // image: { name: "" },
-        });
+        setCabinForm(null);
+        //TODO
     };
+
+    const modalOverlayRef = useRef(null);
+
+    useEffect(() => {
+        const closeModalByEsc = (evt: KeyboardEvent) => {
+            if (evt.key === "Escape") {
+                setShowCabin(false);
+                setCabinForm(null);
+            }
+        };
+        showCabin && document.addEventListener("keydown", closeModalByEsc);
+        return () => document.removeEventListener("keydown", closeModalByEsc);
+    }, [showCabin, setShowCabin, setCabinForm]);
+
+    useEffect(() => {
+        const closeModalByClickOverlay = (evt: MouseEvent) => {
+            if (evt.target === modalOverlayRef.current) {
+                setShowCabin(false);
+                setCabinForm(null);
+            }
+        };
+        showCabin &&
+            document.addEventListener("click", closeModalByClickOverlay);
+        return () =>
+            document.removeEventListener("click", closeModalByClickOverlay);
+    }, [showCabin, setShowCabin, setCabinForm]);
+
     return (
-        <StyledOverlay>
+        <StyledOverlay ref={modalOverlayRef}>
             <StyledModal>
                 {children}
                 <StyledButtonClose onClick={onCloseHandle}>

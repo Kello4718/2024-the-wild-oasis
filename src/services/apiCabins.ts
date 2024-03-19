@@ -11,14 +11,18 @@ export const getCabins = async () => {
 };
 
 export const createCabin = async (cabin: CabinFormData) => {
-    console.log(cabin);
-    const imageName = `${Math.random()}-${
-        cabin.image && cabin.image[0].name
-    }`.replaceAll(" ", "-");
-    const imagePath = `${SUPABASE_URL}/storage/v1/object/public/cabin-images/${imageName}`;
+    const imageName = `${Math.random()}-${cabin?.image[0].name}`.replaceAll(
+        " ",
+        "-"
+    );
+    const hasImagePath = cabin.image[0].name.startsWith(SUPABASE_URL);
+    console.log(cabin.image);
+    const imagePath = hasImagePath
+        ? cabin.image[0].name
+        : `${SUPABASE_URL}/storage/v1/object/public/cabin-images/${imageName}`;
     const { data, error } = await supabase
         .from("Cabins")
-        .insert([{ ...cabin, image: `${imagePath}` }])
+        .insert([{ ...cabin, image: imagePath }])
         .select();
     if (error) {
         throw new Error("Cabin could not be create");
@@ -44,11 +48,11 @@ export const deleteCabin = async (id: number) => {
     return data;
 };
 
-export const updateCabin = async (id: number, cabin: CabinFormData) => {
+export const updateCabin = async (cabin: CabinFormData) => {
     const { data, error } = await supabase
         .from("Cabins")
         .update(cabin)
-        .eq("id", id)
+        .eq("id", cabin.id)
         .select();
 
     if (error) {

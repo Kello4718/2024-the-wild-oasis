@@ -1,6 +1,5 @@
 import styled from "styled-components";
 import { CabinTableData } from "../../types/types";
-import { formatCurrency } from "../../utils/helpers";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { deleteCabin } from "../../services/apiCabins";
 import toast from "react-hot-toast";
@@ -86,7 +85,6 @@ const CabinRow = ({ cabin }: { cabin: CabinTableData }) => {
         onError: () => toast.error("Woops... something that wrong... 😒"),
     });
     // TODO
-    console.log(cabin);
     const { setShowCabin, setCabinForm } = useCabinsContext();
     return (
         <StyledTableRow>
@@ -100,10 +98,22 @@ const CabinRow = ({ cabin }: { cabin: CabinTableData }) => {
                 <StyledCapacity>{maxCapacity}</StyledCapacity>
             </StyledTableCell>
             <StyledTableCell>
-                <StyledPrice>{formatCurrency(regularPrice)}</StyledPrice>
+                <StyledPrice>
+                    {Intl.NumberFormat("de-DE", {
+                        style: "currency",
+                        currency: "EUR",
+                    }).format(regularPrice)}
+                </StyledPrice>
             </StyledTableCell>
             <StyledTableCell>
-                <StyledDiscount>{formatCurrency(discount)}</StyledDiscount>
+                <StyledDiscount>
+                    {discount > 0
+                        ? Intl.NumberFormat("de-DE", {
+                              style: "currency",
+                              currency: "EUR",
+                          }).format(discount)
+                        : "--"}
+                </StyledDiscount>
             </StyledTableCell>
             <StyledTableCell>
                 <Row>
@@ -111,11 +121,10 @@ const CabinRow = ({ cabin }: { cabin: CabinTableData }) => {
                         variation="secondary"
                         onClick={() => {
                             setShowCabin(true);
-                            setCabinForm(() => {
-                                return {
-                                    ...cabin,
-                                    image: { name: cabin.image },
-                                };
+                            setCabinForm({
+                                ...cabin,
+                                image: cabin.image,
+                                //TODO
                             });
                         }}
                         disabled={isPending ? true : false}

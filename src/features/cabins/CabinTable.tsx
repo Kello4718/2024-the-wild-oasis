@@ -5,7 +5,7 @@ import Spinner from "../../components/Spinner";
 import CabinRow from "./CabinRow";
 import { CabinTableData } from "../../types/types";
 import Row from "../../components/Row";
-import { memo } from "react";
+import { memo, useEffect } from "react";
 import useCabinsContext from "../../contexts/useCabinsContext";
 import ErrorFallback from "../../components/ErrorFallback";
 
@@ -42,7 +42,11 @@ const CabinTable = memo(() => {
         queryFn: getCabins,
     });
     const { setStatus } = useCabinsContext();
-    setStatus(status);
+
+    useEffect(() => {
+        setStatus(status);
+    }, [status, setStatus]);
+
     if (status === "pending") return <Spinner />;
     if (status === "error")
         return <ErrorFallback message={error?.message} reloadData={refetch} />;

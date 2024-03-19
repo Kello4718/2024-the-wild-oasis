@@ -2,22 +2,14 @@ import Input from "../../components/Input";
 import Form from "../../components/Form";
 import { useForm } from "react-hook-form";
 import { CabinFormData } from "../../types/types";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { createCabin } from "../../services/apiCabins";
-import toast from "react-hot-toast";
 import FormRow from "../../components/FormRow";
 import Row from "../../components/Row";
 import { Button } from "../../components/Button";
 import Textarea from "../../components/Textarea";
 import FileInput from "../../components/FileInput";
 import useCabinsContext from "../../contexts/useCabinsContext";
-
-const dt = new DataTransfer();
-dt.items.add(new File(["0"], "primer.txt", { type: "text/plain" }));
-const file_list = dt.files;
-
-console.log("Коллекция файлов создана:");
-console.dir(file_list);
+import useUpdateCabin from "./useUpdateCabin";
+import useCreateCabin from "./useCreateCabin";
 
 const CabinForm = () => {
     const { setShowCabin, cabinForm } = useCabinsContext();
@@ -27,31 +19,25 @@ const CabinForm = () => {
         reset,
         formState: { errors },
         getValues,
-        // setValue,
     } = useForm<CabinFormData>({
         mode: "onTouched",
-        // defaultValues: cabinForm ? { ...cabinForm, image: file_list } : {},
-        defaultValues: cabinForm ? { ...cabinForm, image: file_list } : {},
+        defaultValues: cabinForm ? cabinForm : {},
     });
-    const queryClient = useQueryClient();
-    const { mutate } = useMutation({
-        mutationFn: createCabin,
-        onSuccess: () => {
-            toast.success("Cabin was create 😊");
-            queryClient.invalidateQueries({
-                queryKey: ["cabin"],
-            });
-            reset();
-            setShowCabin(false);
-        },
-        onError: () => toast.error("Woops... something that wrong... 😒"),
-    });
+
+    const { mutateCreate } = useCreateCabin(reset);
+    const { mutateUpdate } = useUpdateCabin(reset);
 
     const onSubmit = (data: CabinFormData) => {
         const image = getValues().image;
-        mutate({ ...data, image });
+        if (cabinForm) {
+            mutateUpdate(data);
+        } else {
+            mutateCreate({ ...data, image });
+        }
     };
+
     const onError = () => console.log(errors);
+
     return (
         <Form onSubmit={handleSubmit(onSubmit, onError)}>
             <FormRow label="Cabin name" errors={errors.name}>
@@ -96,6 +82,7 @@ const CabinForm = () => {
                     type="number"
                     id="discount"
                     {...register("discount", {
+                        required: false,
                         validate: (value) =>
                             (value &&
                                 value < Number(getValues().regularPrice)) ||
@@ -121,9 +108,10 @@ const CabinForm = () => {
                 <FileInput
                     id="image"
                     accept="image/*"
-                    // value={file_list[0] && file_list[0].name}
                     {...register("image", {
-                        required: "This field is required 🙋‍♂️",
+                        required: cabinForm
+                            ? false
+                            : "This field is required 🙋‍♂️",
                     })}
                 />
             </FormRow>
@@ -136,7 +124,7 @@ const CabinForm = () => {
                 >
                     Cancel
                 </Button>
-                <Button>Add cabin</Button>
+                <Button>{cabinForm ? "Edit cabin" : "Add cabin"}</Button>
             </Row>
         </Form>
     );

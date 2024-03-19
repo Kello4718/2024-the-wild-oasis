@@ -10,8 +10,8 @@ import { CabinFormData } from "../types/types";
 type State = {
     showCabin: boolean;
     setShowCabin: Dispatch<SetStateAction<boolean>>;
-    cabinForm: CabinFormData;
-    setCabinForm: Dispatch<SetStateAction<CabinFormData>>;
+    cabinForm: CabinFormData | null;
+    setCabinForm: Dispatch<SetStateAction<CabinFormData | null>>;
     setStatus: Dispatch<SetStateAction<string>>;
     error: Error;
     setError: Dispatch<SetStateAction<Error>>;
@@ -23,14 +23,8 @@ const Cabins = () => {
     const [showCabin, setShowCabin] = useState(false);
     const [status, setStatus] = useState("");
     const [error, setError] = useState<Error>(new Error());
-    const [cabinForm, setCabinForm] = useState<CabinFormData>({
-        name: "",
-        maxCapacity: null,
-        regularPrice: null,
-        discount: null,
-        description: "",
-        // image: { name: "" },
-    });
+    const [cabinForm, setCabinForm] = useState<CabinFormData | null>(null);
+
     return (
         <CabinsContext.Provider
             value={{
@@ -46,7 +40,7 @@ const Cabins = () => {
             {status === "success" && (
                 <Row type="horizontal">
                     <Heading as="h1">All cabins</Heading>
-                    <p>fILTER SORT</p>
+                    <p>Filter sort</p>
                 </Row>
             )}
             <Row type="vertical">
